@@ -1,0 +1,11 @@
+{
+  "name": "leadgenman-video-skills",
+  "description": "Six Claude Code skills for an automated video content pipeline: produce (rough cut), srt (caption cleanup), ytdescription (YouTube descriptions), igcaption (Instagram captions), reel-overlay (alpha overlays), and new-series (Canvas 2D content series).",
+  "version": "1.0.0",
+  "author": {
+    "name": "Manthan Patel",
+    "url": "https://github.com/manthanpatelll"
+  },
+  "repository": "https://github.com/manthanpatelll/leadgenman-video-skills",
+  "license": "MIT"
+}

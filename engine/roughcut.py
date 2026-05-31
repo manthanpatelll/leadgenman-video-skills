@@ -18,7 +18,7 @@ from rapidfuzz import fuzz
 # ============================================================
 # CONFIGURATION
 # ============================================================
-SILENCE_MERGE_THRESHOLD = 0.30   # seconds -- Manthan's sweet spot
+SILENCE_MERGE_THRESHOLD = 0.30   # seconds -- tuned sweet spot for conversational speech
 MIN_CHUNK_DURATION = 1.0         # skip fragments under this
 RETAKE_TEXT_THRESHOLD = 60       # rapidfuzz token_sort_ratio
 RETAKE_NOUN_OVERLAP = 0.60      # overlap coefficient
@@ -31,12 +31,21 @@ AUDIO_BITRATE = "256k"
 
 
 def load_api_key():
-    env_path = "/Users/manthan/Desktop/NotifyMotion/.env.local"
-    with open(env_path) as f:
-        for line in f:
-            if line.startswith("OPENAI_API_KEY="):
-                return line.strip().split("=", 1)[1]
-    raise RuntimeError("OPENAI_API_KEY not found in .env.local")
+    # Prefer the OPENAI_API_KEY environment variable. Fall back to a local
+    # .env.local in the current working directory if present.
+    key = os.environ.get("OPENAI_API_KEY")
+    if key:
+        return key.strip()
+    env_path = os.path.join(os.getcwd(), ".env.local")
+    if os.path.exists(env_path):
+        with open(env_path) as f:
+            for line in f:
+                if line.startswith("OPENAI_API_KEY="):
+                    return line.strip().split("=", 1)[1]
+    raise RuntimeError(
+        "OPENAI_API_KEY not set. Export it as an environment variable "
+        "(export OPENAI_API_KEY=sk-...) or add it to a .env.local file."
+    )
 
 
 def extract_audio(video_path, output_path):
@@ -456,7 +465,7 @@ def produce(video_path):
 
     # Setup
     video_name = os.path.splitext(os.path.basename(video_path))[0]
-    output_dir = f"/Users/manthan/Desktop/NotifyMotion/exports/produce/{video_name}_{int(time.time())}"
+    output_dir = os.path.join(os.getcwd(), "exports", "produce", f"{video_name}_{int(time.time())}")
     os.makedirs(output_dir, exist_ok=True)
 
     client = OpenAI(api_key=load_api_key())
